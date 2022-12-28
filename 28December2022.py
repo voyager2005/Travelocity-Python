@@ -16,6 +16,8 @@ travel_date = ''
 today_time = ''
 date_diff = "2"
 username = ""
+source_city = ""
+destination_city = ""
 flights = {"Bengaluru_to_Delhi": 9,
            "Bengaluru_to_Kolkata": 10,
            "Bengaluru_to_Mumbai": 11,
@@ -193,10 +195,12 @@ def login_user(sql_cursor):
     sql_cursor.execute("SELECT * FROM USERS")
     data = sql_cursor.fetchall()
 
+    # fetching all the usernames stored in the database
     username_list = list()
     for k in range(0, len(data)):
         username_list.append(data[k][1])
 
+    # fetching all the passwords corresponding to the usernames in the database
     password_list = list()
     for k in range(0, len(data)):
         password_list.append(data[k][2])
@@ -265,6 +269,9 @@ the destination cities in the form of a menu. The choice is stored in a variable
 
 
 def choose_city():
+    global source_city
+    global destination_city
+
     city_list = ["Bengaluru", "Mumbai", "Kolkata", "Chennai", "Delhi"]
 
     # displaying all the cities we fly from
@@ -403,7 +410,7 @@ def display_aeroplane_seat():
     global occupied_seats
     global all_seats
 
-    # displaying Business Class
+    # displaying First Class
     print("              " + f"{bcolors.BOLD}First Class{bcolors.ENDC}" + "              ")
 
     for k in range(0, 4):
@@ -419,7 +426,7 @@ def display_aeroplane_seat():
         elif not occupied_seats[k] and (k == 1 or k == 3):
             print(f"{bcolors.OKGREEN}{all_seats[k]}{bcolors.ENDC}" + " ▢", end="\n")
 
-    # displaying First Class
+    # displaying Business Class
     print("             " + f"{bcolors.BOLD}Business Class{bcolors.ENDC}" + "           ")
 
     for k in range(4, 16):
@@ -623,11 +630,11 @@ if login:
     print(f"{bcolors.WARNING}[1]{bcolors.ENDC} {bcolors.HEADER}BOOK A FLIGHT{bcolors.ENDC}\n"
           f"{bcolors.WARNING}[2]{bcolors.ENDC} {bcolors.HEADER}SEE BOOKED FLIGHTS{bcolors.ENDC}\n")
     c = input()
-    if choice == '1':
+    if c == '1':
         source_city, destination_city = choose_city()
         key = source_city + "_to_" + destination_city
         date_choice(key)
-    elif choice == '2':
+    elif c == '2':
         show_booked_flights(cursor)
         # i need to use a goto here to take this back to the beginning of the menu (book flight and see booked flights)
 elif signup:
