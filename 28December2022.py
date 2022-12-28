@@ -14,7 +14,6 @@ login = False
 today_date = ''
 travel_date = ''
 today_time = ''
-date_diff = "2"
 username = ""
 source_city = ""
 destination_city = ""
@@ -44,16 +43,6 @@ flights = {"Bengaluru_to_Delhi": 9,
            "Chennai_to_Kolkata": 0}
 
 percentage = 10
-current_user_number = 0
-
-if date_diff == '0':
-    percentage = 3
-elif date_diff == '1':
-    percentage = 5
-elif date_diff == '2':
-    percentage = 7
-else:
-    percentage = 10
 
 occupied_seats = list()
 all_seats = ["1A", "1F", "2A", "2F", "3A", "3B", "3E", "3F", "4A", "4B", "4E", "4F", "5A", "5B", "5E", "5F",
@@ -70,23 +59,6 @@ name = list()
 email = list()
 phone_number = list()
 current_user_number = 0
-
-for i in range(0, len(all_seats)):
-    x = randint(0, 10)
-    if 0 < x < percentage:
-        occupied_seats.append(False)
-    else:
-        occupied_seats.append(True)
-
-occupied = 0
-vacant = 0
-for i in range(0, len(occupied_seats)):
-    if occupied_seats[i]:
-        occupied = occupied + 1
-    else:
-        vacant = vacant + 1
-print("vacant: ", vacant)
-print("occupied: ", occupied)
 
 
 # __user defined functions__
@@ -636,14 +608,36 @@ if login:
         date_choice(key)
     elif c == '2':
         show_booked_flights(cursor)
-        # i need to use a goto here to take this back to the beginning of the menu (book flight and see booked flights)
+        # I need to use a goto here to take this back to the beginning of the menu (book flight and see booked flights)
 elif signup:
     print(f'{bcolors.HEADER}BOOK A FLIGHT{bcolors.ENDC}')
     source_city, destination_city = choose_city()
     key = source_city + "_to_" + destination_city
     date_choice(key)
 
+# creating the airplane seat booking
+u = travel_date - today_date
+string1 = str(u)
+string = string1.split(" ")
+date_diff = string[0].strip()
 
+if date_diff == '0':
+    percentage = 3
+elif date_diff == '1':
+    percentage = 5
+elif date_diff == '2':
+    percentage = 7
+else:
+    percentage = 10
+
+for i in range(0, len(all_seats)):
+    x = randint(0, 10)
+    if 0 < x < percentage:
+        occupied_seats.append(False)
+    else:
+        occupied_seats.append(True)
+
+# seat booking
 total_number_of_seats = input("Total number of reservations: ")
 available_number_of_seats = 0
 
@@ -666,16 +660,6 @@ while True:
 terminator = int(total_number_of_seats)
 terminator = terminator - 1
 display_aeroplane_seat()
-
-# inserting the information into the database
-print("username: ", username)
-print("source of travel: ", source_city)
-print("destination of travel: ", destination_city)
-print("date of travel: ", travel_date)
-print("booking name: ", name)
-print("seat booked: ", users_seat)
-print("phone number: ", phone_number)
-print("email: ", email)
 
 for i in range(0, len(name)):
     n = name[i]
