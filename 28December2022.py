@@ -1,10 +1,16 @@
-from colors import bcolors
+# importing inbuilt functions
 import mysql.connector as mysql
 from datetime import date, timedelta
-import time
 from random import randint
+import time
+
+# importing files
+from colors import bcolors
+
 
 # global variables
+signup = False
+login = False
 today_date = ''
 travel_date = ''
 today_time = ''
@@ -118,6 +124,7 @@ to store them into the database
 
 def create_user(sql_mycon, sql_cursor):
     global username
+    global signup
 
     # reading usernames and storing them in l
     sql_cursor.execute("SELECT * FROM USERS")
@@ -170,6 +177,7 @@ def create_user(sql_mycon, sql_cursor):
     s = f"insert into users values('{users_name}', '{username}', '{password}', '{users_email}', {str_number})"
     sql_cursor.execute(s)
     sql_mycon.commit()
+    signup = True
 
 
 '''
@@ -180,6 +188,7 @@ accepting the values of username and the password to then verify with those in t
 
 def login_user(sql_cursor):
     global username
+    global login
 
     sql_cursor.execute("SELECT * FROM USERS")
     data = sql_cursor.fetchall()
@@ -206,6 +215,46 @@ def login_user(sql_cursor):
                 print(f"\n{bcolors.UNDERLINE}{bcolors.OKBLUE}{bcolors.BOLD}Welcome to you Air servers account"
                       f"{bcolors.ENDC}{bcolors.ENDC}{bcolors.BOLD}\n")
                 break
+
+    login = True
+
+
+'''
+show_booked_flights():
+this user defined function accepts the username, from -> to and date of travel and checks the database to see if there 
+is a matching record for the same and then displays the record
+'''
+
+
+def show_booked_flights(mysql_cursor):
+    global username
+
+    date_of_flight = input("Please enter the date of the flight: ")
+    source_of_travel = input("Source: ")
+    destination_of_travel = input("Destination: ")
+    s = f'select * from booked_flight_details where username = "{username}" and' \
+        f' source_of_travel = "{source_of_travel}" and destination_of_travel = "{destination_of_travel}" and' \
+        f' date_of_travel = "{date_of_flight}"'
+    mysql_cursor.execute(s)
+    y = mysql_cursor.fetchall()
+
+    print()
+    if len(y) == 0:
+        print(f'There are no seats booked under your {bcolors.OKCYAN}username: {username}{bcolors.ENDC} '
+              f'from {bcolors.OKCYAN}{source_of_travel}{bcolors.ENDC} to'
+              f' {bcolors.OKCYAN}{destination_of_travel}{bcolors.ENDC} on'
+              f' {bcolors.OKCYAN}{date_of_flight}{bcolors.ENDC}')
+    else:
+        for k in range(0, len(y)):
+            current_user = y[k]
+            print(f'{bcolors.HEADER}username:{bcolors.ENDC} {current_user[0]} \n'
+                  f'{bcolors.HEADER}source of travel:{bcolors.ENDC} {current_user[1]} \n'
+                  f'{bcolors.HEADER}destination of travel:{bcolors.ENDC} {current_user[2]} \n'
+                  f'{bcolors.HEADER}date of travel:{bcolors.ENDC} {current_user[3]} \n'
+                  f'{bcolors.HEADER}booking name:{bcolors.ENDC} {current_user[4]} \n'
+                  f'{bcolors.HEADER}seat booked:{bcolors.ENDC} {current_user[5]} \n'
+                  f'{bcolors.HEADER}phone number:{bcolors.ENDC} {current_user[6]} \n'
+                  f'{bcolors.HEADER}email: {bcolors.ENDC}{current_user[7]} \n')
 
 
 '''
@@ -557,6 +606,7 @@ def accept_users_seat():  # accepting the users seat number --------------------
 mycon = mysql.connect(host="localhost", user="root", port='3306', password="Akshat@2005", database="class12project")
 cursor = mycon.cursor()
 
+# displaying welcome message to the user and prompting for signup and login
 while True:
     display_welcome()
     choice = int(input(f'{bcolors.OKBLUE}Please enter your choice: {bcolors.ENDC}'))
@@ -564,12 +614,28 @@ while True:
         create_user(mycon, cursor)
     elif choice == 2:
         login_user(cursor)
-        source_city, destination_city = choose_city()
-        key = source_city + "_to_" + destination_city
-        date_choice(key)
         break
     else:
         print(f'{bcolors.FAIL}INVALID CHOICE{bcolors.ENDC}')
+
+# menu for Booking a flight and checking for booked flights
+if login:
+    print(f"{bcolors.WARNING}[1]{bcolors.ENDC} {bcolors.HEADER}BOOK A FLIGHT{bcolors.ENDC}\n"
+          f"{bcolors.WARNING}[2]{bcolors.ENDC} {bcolors.HEADER}SEE BOOKED FLIGHTS{bcolors.ENDC}\n")
+    c = input()
+    if choice == '1':
+        source_city, destination_city = choose_city()
+        key = source_city + "_to_" + destination_city
+        date_choice(key)
+    elif choice == '2':
+        show_booked_flights(cursor)
+        # i need to use a goto here to take this back to the beginning of the menu (book flight and see booked flights)
+elif signup:
+    print(f'{bcolors.HEADER}BOOK A FLIGHT{bcolors.ENDC}')
+    source_city, destination_city = choose_city()
+    key = source_city + "_to_" + destination_city
+    date_choice(key)
+
 
 total_number_of_seats = input("Total number of reservations: ")
 available_number_of_seats = 0
