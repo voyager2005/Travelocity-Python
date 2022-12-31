@@ -289,53 +289,56 @@ def date_choice(source_destination_pair, flights):
     # getting current date from the users computer
     today_date = date.today()
 
-    # reading the date of the flight from the user
-    dt, mt, yt = [int(k) for k in input("Enter Travel Date (dd/mm/yyyy): ").split('/')]
-    date_diff = ''
-    travel_date = date(yt, mt, dt)
+    while True:
+        dt, mt, yt = [int(k) for k in input("Enter Travel Date (dd/mm/yyyy): ").split('/')]
 
-    try:
-        travel_date = date(yt, mt, dt)
-        s = str(travel_date - today_date)
-        date_diff = s.split()[0]
+        try:
+            travel_date = date(yt, mt, dt)
+            s = str(travel_date - today_date)
+            date_diff = s.split()[0]
 
-        if date_diff == "0:00:00":
-            # find difference between the users time and the time of the flight
-            hour = today_time.split(":")[0]
-            if (flights[source_destination_pair] - int(hour)) <= 2:
-                print("INVALID FLIGHT TIMINGS")
-                reschedule_flight = input("Would you like to book the same flight for tomorrow. Type Yes to confirm")
-                if reschedule_flight.lower() == "yes":
-                    tomorrow_date = date.today() + timedelta(1)
-                    tomorrow_date = tomorrow_date.strftime('%d-%m-%Y')
+            if date_diff == "0:00:00":
+                # find difference between the users time and the time of the flight
+                hour = today_time.split(":")[0]
+                if (flights[source_destination_pair] - int(hour)) <= 2:
+                    print("INVALID FLIGHT TIMINGS")
+                    reschedule_flight = input("Would you like to book the same flight for tomorrow."
+                                              " Type Yes to confirm")
+                    if reschedule_flight.lower() == "yes":
+                        tomorrow_date = date.today() + timedelta(1)
+                        tomorrow_date = tomorrow_date.strftime('%d-%m-%Y')
 
-                    final_key = source_destination_pair.split("_")
-                    source_of_travel = final_key[0]
-                    destination_of_travel = final_key[2]
-                    print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
-                          f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
-                          f'{bcolors.HEADER}{tomorrow_date}{bcolors.ENDC} at '
-                          f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
-                else:
-                    print(f"{bcolors.FAIL}terminated{bcolors.ENDC}")
+                        final_key = source_destination_pair.split("_")
+                        source_of_travel = final_key[0]
+                        destination_of_travel = final_key[2]
+                        print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
+                              f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
+                              f'{bcolors.HEADER}{tomorrow_date}{bcolors.ENDC} at '
+                              f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+                        break
+                    else:
+                        continue
 
-        elif int(date_diff) < 0:
-            print("Date Has passed")
+            elif int(date_diff) < 0:
+                print("Date Has passed")
+                continue
 
-        elif int(date_diff) <= 3:
-            final_key = source_destination_pair.split("_")
-            source_of_travel = final_key[0]
-            destination_of_travel = final_key[2]
-            print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
-                  f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
-                  f'{bcolors.HEADER}{travel_date}{bcolors.ENDC} at '
-                  f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+            elif int(date_diff) <= 3:
+                final_key = source_destination_pair.split("_")
+                source_of_travel = final_key[0]
+                destination_of_travel = final_key[2]
+                print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
+                      f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
+                      f'{bcolors.HEADER}{travel_date}{bcolors.ENDC} at '
+                      f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+                break
 
-        else:
-            print(f"Reservations not available for {travel_date}")
+            else:
+                print(f"Reservations not available for {travel_date}")
+                continue
 
-    except ValueError:
-        print("INVALID DATE")
+        except ValueError:
+            print("INVALID DATE")
 
     return date_diff, str(travel_date)
 
