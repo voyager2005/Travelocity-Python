@@ -13,7 +13,7 @@ from Subway import add_bread, add_meat, add_veggies, add_seasoning, add_drinks, 
 display_welcome():
 user defined function to: 
 1. display a welcome message/ sign
-2. show the meny for signup (create an account) or login (use an already existing account
+2. show the menu for signup (create an account) or login (use an already existing account
 '''
 
 
@@ -318,7 +318,7 @@ def date_choice(source_destination_pair, flights):
                         break
                     else:
                         continue
-
+                break
             elif int(date_diff) < 0:
                 print("Date Has passed")
                 continue
