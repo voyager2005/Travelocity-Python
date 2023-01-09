@@ -660,9 +660,6 @@ def accept_users_seat(number_of_seats_booked, users_seat,
 
                 # finding index of all seats
                 all_seats_index = all_seats.index(users_seat[number_of_seats_booked])
-                print(all_seats_index)
-                print(users_seat[number_of_seats_booked])
-                print(occupied_seats)
 
                 if occupied_seats[all_seats_index]:
                     print(f"{bcolors.WARNING}{bcolors.BOLD}That seat has already been booked/reserved"
