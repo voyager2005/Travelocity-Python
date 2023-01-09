@@ -1,0 +1,11 @@
+MYSQL commands:
+
+• mysql command to show the boarding pass of the user:
+select username, source_of_travel, destination_of_travel, booking_name, seat_booked, phone_number, email, cost from booked_flight_details;
+
+• mysql command to show the room reservation of the user:
+select username, booking_name, source_of_travel, destination_of_travel, date_of_travel, room_name, room_cost from booked_flight_details;
+
+• mysql command to show the food ordered by the user:
+select username, booking_name, source_of_travel, destination_of_travel, date_of_travel, food, food_cost from booked_flight_details;
+
