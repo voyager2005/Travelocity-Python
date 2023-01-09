@@ -5,12 +5,16 @@ import time
 # importing files
 from colors import bcolors
 from HotelRoomReservation import hotel_room_reservation
-from Subway import add_bread
+from Subway import add_bread, add_meat, add_veggies, add_seasoning, add_drinks, add_others, display_bill
 
 
 # __user defined functions__
-'''display_welcome():
-user defined function to display welcome'''
+'''
+display_welcome():
+user defined function to: 
+1. display a welcome message/ sign
+2. show the menu for signup (create an account) or login (use an already existing account
+'''
 
 
 def display_welcome():
@@ -33,13 +37,16 @@ def display_welcome():
 
 '''
 create_user(mycon, cursor):
-user defined function to accept information such as
+user defined function to accept information such as:
 1. username
 2. name
 3. password for the account being created
 4. email address
 5. phone number , etc 
-to store them into the database 
+and to store all the information into the database: class12project, table: users
+:param sql_mycon: mysql connection object
+:param sql_cursor: mysql cursor object
+:return: returns username of the user and a boolean value signup
 '''
 
 
@@ -103,7 +110,10 @@ def create_user(sql_mycon, sql_cursor):
 '''
 login_user(cursor):
 user defined function for logging in
-accepting the values of username and the password to then verify with those in the database'''
+accepting the values of username and the password to then verify with those in the database
+:param sql_cursor: mysql cursor object
+:return: returns the username of the user and a boolean variable login 
+'''
 
 
 def login_user(sql_cursor):
@@ -143,6 +153,9 @@ def login_user(sql_cursor):
 show_booked_flights():
 this user defined function accepts the username, from -> to and date of travel and checks the database to see if there 
 is a matching record for the same and then displays the record
+:param mysql_cursor: mysql cursor object
+:param username_of_user: login username of the user
+:return: NONE
 '''
 
 
@@ -190,7 +203,9 @@ def show_booked_flights(mysql_cursor, username_of_user):
 choose_city():
 user defined function to choose the source and destination cities from the user
 A meny is displayed for the source city, this value is stored in a variable and the remaining cities are displayed as
-the destination cities in the form of a menu. The choice is stored in a variable and is returned to the function call'''
+the destination cities in the form of a menu. The choice is stored in a variable and is returned to the function call
+:returns: source city/ where the user is travelling from, destination city/ where the user is travelling to
+'''
 
 
 def choose_city():
@@ -255,7 +270,11 @@ various checks are help on the date passed to make sure that this date is in pro
 ie. that there is no value of date exceeding these dates 28/29/30/31 based on the month of travel
 the month of travel is not > 12 
 and the date of travel is not from the past
-The value of time of travel is also accepted from the user and similar checks are help on that'''
+The value of time of travel is also accepted from the user and similar checks are help on that
+:param source_destination_pair: the key in the dictionary flights
+:param flights: dictionary that stores all the source to destination pairs that exist
+:returns: difference in today's date and travel date, date of travel
+'''
 
 
 def date_choice(source_destination_pair, flights):
@@ -265,53 +284,56 @@ def date_choice(source_destination_pair, flights):
     # getting current date from the users computer
     today_date = date.today()
 
-    # reading the date of the flight from the user
-    dt, mt, yt = [int(k) for k in input("Enter Travel Date (dd/mm/yyyy): ").split('/')]
-    date_diff = ''
-    travel_date = date(yt, mt, dt)
+    while True:
+        dt, mt, yt = [int(k) for k in input("Enter Travel Date (dd/mm/yyyy): ").split('/')]
 
-    try:
-        travel_date = date(yt, mt, dt)
-        s = str(travel_date - today_date)
-        date_diff = s.split()[0]
+        try:
+            travel_date = date(yt, mt, dt)
+            s = str(travel_date - today_date)
+            date_diff = s.split()[0]
 
-        if date_diff == "0:00:00":
-            # find difference between the users time and the time of the flight
-            hour = today_time.split(":")[0]
-            if (flights[source_destination_pair] - int(hour)) <= 2:
-                print("INVALID FLIGHT TIMINGS")
-                reschedule_flight = input("Would you like to book the same flight for tomorrow. Type Yes to confirm")
-                if reschedule_flight.lower() == "yes":
-                    tomorrow_date = date.today() + timedelta(1)
-                    tomorrow_date = tomorrow_date.strftime('%d-%m-%Y')
+            if date_diff == "0:00:00":
+                # find difference between the users time and the time of the flight
+                hour = today_time.split(":")[0]
+                if (flights[source_destination_pair] - int(hour)) <= 2:
+                    print("INVALID FLIGHT TIMINGS")
+                    reschedule_flight = input("Would you like to book the same flight for tomorrow."
+                                              " Type Yes to confirm")
+                    if reschedule_flight.lower() == "yes":
+                        tomorrow_date = date.today() + timedelta(1)
+                        tomorrow_date = tomorrow_date.strftime('%d-%m-%Y')
 
-                    final_key = source_destination_pair.split("_")
-                    source_of_travel = final_key[0]
-                    destination_of_travel = final_key[2]
-                    print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
-                          f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
-                          f'{bcolors.HEADER}{tomorrow_date}{bcolors.ENDC} at '
-                          f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
-                else:
-                    print(f"{bcolors.FAIL}terminated{bcolors.ENDC}")
+                        final_key = source_destination_pair.split("_")
+                        source_of_travel = final_key[0]
+                        destination_of_travel = final_key[2]
+                        print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
+                              f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
+                              f'{bcolors.HEADER}{tomorrow_date}{bcolors.ENDC} at '
+                              f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+                        break
+                    else:
+                        continue
+                break
+            elif int(date_diff) < 0:
+                print("Date Has passed")
+                continue
 
-        elif int(date_diff) < 0:
-            print("Date Has passed")
+            elif int(date_diff) <= 3:
+                final_key = source_destination_pair.split("_")
+                source_of_travel = final_key[0]
+                destination_of_travel = final_key[2]
+                print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
+                      f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
+                      f'{bcolors.HEADER}{travel_date}{bcolors.ENDC} at '
+                      f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+                break
 
-        elif int(date_diff) <= 3:
-            final_key = source_destination_pair.split("_")
-            source_of_travel = final_key[0]
-            destination_of_travel = final_key[2]
-            print(f'Your flight is from {bcolors.HEADER}{source_of_travel}{bcolors.ENDC} to'
-                  f' {bcolors.HEADER}{destination_of_travel}{bcolors.ENDC} on '
-                  f'{bcolors.HEADER}{travel_date}{bcolors.ENDC} at '
-                  f'{bcolors.HEADER}{flights[source_destination_pair]}:00 hrs{bcolors.ENDC}')
+            else:
+                print(f"Reservations not available for {travel_date}")
+                continue
 
-        else:
-            print(f"Reservations not available for {travel_date}")
-
-    except ValueError:
-        print("INVALID DATE")
+        except ValueError:
+            print("INVALID DATE")
 
     return date_diff, str(travel_date)
 
@@ -321,7 +343,10 @@ display_aeroplane_seat():
 Based on the date of travel and time of travel a unique airplane layout is created for the user and is displayed 
 using the display_aeroplane_seat() function
 the proper formatting of the display is done by this function including adding red color to the seats that have already 
-been booked and green colour to the seats that are yet to be booked'''
+been booked and green colour to the seats that are yet to be booked
+:param occupied_seats_2: <bool> list of all values representing which seats are occupied and which are vacant
+:param all_seats: <str> list of all the seats in the airplane
+'''
 
 
 def display_aeroplane_seat(occupied_seats_2, all_seats):
@@ -450,13 +475,31 @@ def display_aeroplane_seat(occupied_seats_2, all_seats):
 """
 accept_users_seat():
 accepts the seat that user wants to book and changes the reservation status of that seat (colour) in display
+:param number_of_seats_booked: <int> keeps track of how many seats the user has booked
+:param users_seats: <list> to keep a track of all the seats the user has booked
+:param all_seats_index: 
+:param occupied_seats: <bool> list of all values representing which seats are occupied and which are vacant
+:param terminator: <int> total number of reservations the user wants to make
+:param name: <str> LIST of all the names corresponding to the reservation
+:param email: <str> LIST of all the emails corresponding to the reservation
+:param phone_number: <int> LIST of all the phone numbers corresponding to the reservation
+:param current_user_number: <int> keeps track of how many reservations are completed
+:param all_seats: <str> list of all the seats in the airplane
+:param room: <bool> LIST of if the user corresponding to the reservation has booked a room
+:param room_cost:<int> LIST of all the rooms corresponding to the reservation
+:param room_choice: <str> LIST of all the room cost corresponding to the reservation
+:param food: <bool> LIST of if the user corresponding to the reservation has booked food
+:param food_list: <str> LIST of all the food ordered corresponding to the reservation
+:param food_cost: <int> LIST of all the costs of food ordered corresponding to the reservation
+:param travel_date: <date> travel date
 """
 
 
 def accept_users_seat(number_of_seats_booked, users_seat, all_seats_index,
                       occupied_seats, terminator, name, email, phone_number, current_user_number, all_seats,
                       room, room_cost, room_choice,
-                      food, food_list, food_cost):
+                      food, food_list, food_cost,
+                      travel_date):
     while True:
         if current_user_number <= terminator:
             # accepting the name of the user ----------------------------------------------------------------
@@ -515,7 +558,7 @@ def accept_users_seat(number_of_seats_booked, users_seat, all_seats_index,
                           f'{bcolors.FAIL}yes/no{bcolors.ENDC}: ').lower().strip()
 
             if check == 'yes':
-                a, b = hotel_room_reservation()
+                a, b = hotel_room_reservation(travel_date)
                 room.append(True)
                 room_choice.append(a)
                 room_cost.append(b)
@@ -526,7 +569,13 @@ def accept_users_seat(number_of_seats_booked, users_seat, all_seats_index,
             check = input(f'{bcolors.HEADER}Do you want preorder your meal {bcolors.ENDC}'
                           f'{bcolors.FAIL}yes/no{bcolors.ENDC}: ').lower().strip()
             if check == 'yes':
-                a, b = add_bread()
+                add_bread()
+                add_meat()
+                add_veggies()
+                add_seasoning()
+                add_drinks()
+                add_others()
+                a, b = display_bill()
                 food.append(True)
                 food_list.append(a)
                 food_cost.append(b)
